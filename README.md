@@ -5,10 +5,10 @@ This package provides tools for real-time ultrasound bone segmentation, 3D recon
 ## 📁 Project Structure
 
 ```
-scanlite_analysis/
+scanlite_analysis_ros2/
 ├── launch/
 │   └── segmentation_launch.py
-├── scripts/
+├── scanlite_analysis_ros2/
 │   ├── segmentation_node.py
 │   ├── rosbagtest.py
 │   ├── LiveDemoTool.py
