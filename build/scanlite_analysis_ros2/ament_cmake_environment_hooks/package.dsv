@@ -1,0 +1,4 @@
+source;share/scanlite_analysis_ros2/local_setup.bash
+source;share/scanlite_analysis_ros2/local_setup.dsv
+source;share/scanlite_analysis_ros2/local_setup.sh
+source;share/scanlite_analysis_ros2/local_setup.zsh

@@ -17,6 +17,7 @@ install(PROGRAMS
   scanlite_analysis_ros2/LiveDemoTool.py
   scanlite_analysis_ros2/DataAcqTool.py
   scanlite_analysis_ros2/rosbagtest.py
+  scanlite_analysis_ros2/reconstruction_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
