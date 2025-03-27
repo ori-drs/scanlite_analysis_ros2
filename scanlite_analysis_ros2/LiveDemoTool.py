@@ -122,7 +122,7 @@ class CatMausApp:
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # Begin the periodic update loop.
-        self.master.after(30, self.update_display)
+        self.master.after(200, self.update_display)
 
     def connect_data(self):
         if not self.var_connected:
@@ -183,7 +183,7 @@ class CatMausApp:
             self.canvas.draw()
 
         # Schedule the next update
-        self.master.after(30, self.update_display)
+        self.master.after(5, self.update_display)
 
     def save_reconstruction(self):
         # Again, this assumes reconstruct_3D implements get_data_3d().

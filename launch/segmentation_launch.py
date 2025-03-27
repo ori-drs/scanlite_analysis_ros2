@@ -21,7 +21,7 @@ def generate_launch_description():
     
     image_segmenter_node = Node(
         package='scanlite_analysis_ros2',
-        executable='reconstruction_node.py',
+        executable='LiveDemoTool.py',
         name='image_segmenter',
         output='screen',
         parameters=[{'image_topic': LaunchConfiguration('image_topic')}]
