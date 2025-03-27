@@ -1,9 +1,0 @@
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/uninstall.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/scanlite_analysis_ros2_uninstall.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/test.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/edit_cache.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/rebuild_cache.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/list_install_components.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/install.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/install/local.dir
-/home/nadia/ros2_humble/src/scanlite_analysis_ros2/build/scanlite_analysis_ros2/CMakeFiles/install/strip.dir

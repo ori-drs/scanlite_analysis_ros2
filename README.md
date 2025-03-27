@@ -10,9 +10,12 @@ scanlite_analysis_ros2/
 │   └── segmentation_launch.py
 ├── scanlite_analysis_ros2/
 │   ├── segmentation_node.py
+│   ├── reconstruction_node.py
+        ├─► Real-time 3D reconstruction
+    │   ├─► Interactive 3D visualization
+    │   └─► Point cloud publishing
 │   ├── rosbagtest.py
 │   ├── LiveDemoTool.py
-│   ├── DataAcqTool.py
 │   └── PyCATMAUS/
 │       ├── SegBone.py
 │       └── TransFunction.py
@@ -84,29 +87,6 @@ scanlite_analysis_ros2/
 | **F1**    | Energy smoothness weight    | Penalizes abrupt depth changes. Higher values produce gradual transitions. |
 | **Bth**   | Bone threshold              | Pixel intensity threshold. Lower values include more pixels as bone. |
 | **JC**    | Jump constraint             | Limits allowed segmentation path jumps. Higher values increase path flexibility. |
-
-## System Flow Diagram
-
-```plaintext
-Live Ultrasound & Vicon motion data (/us_image, Vicon topics)
-│
-├─► segmentation_node.py ────► ROS Topics (segmentation data)
-│
-├─► reconstruction_node.py
-│   ├─► Real-time 3D reconstruction
-│   ├─► Interactive 3D visualization
-│   └─► Point cloud publishing
-│
-├─► DataAcqTool.py ────► Live device acquisition GUI (Tkinter)
-│
-└─► LiveDemoTool.py (CatMausApp)
-    │
-    ├─► GUI (Tkinter & Matplotlib)
-    ├── Image & segmentation visualization
-    ├── Segmentation parameters control
-    ├── Real-time segmentation (`BoneSeg()`)
-    └── 3D Reconstruction (interactive)
-```
 
 ## Usage
 
