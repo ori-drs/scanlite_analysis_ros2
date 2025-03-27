@@ -26,6 +26,15 @@ scanlite_analysis_ros2/
 - Publishes real-time segmentation results as ROS topics.
 - Independent from GUI, facilitating integration into broader ROS systems.
 
+### `reconstruction_node.py`
+- Performs real-time 3D reconstruction of segmented bone surfaces
+- Subscribes to `/us_image` and `/vicon/clarius_5_marker/clarius_5_marker` topics
+- Publishes:
+  - Segmented images (`/seg_bone/image`)
+  - 3D point cloud data (`/rec_bone/points`)
+- Features interactive 3D visualization using Matplotlib
+- Includes coordinate axes visualization for scanner position tracking
+
 ## 🖥 GUI Tools (Tkinter)
 
 | Tool                  | Description                                             |
@@ -83,6 +92,11 @@ Live Ultrasound & Vicon motion data (/us_image, Vicon topics)
 │
 ├─► segmentation_node.py ────► ROS Topics (segmentation data)
 │
+├─► reconstruction_node.py
+│   ├─► Real-time 3D reconstruction
+│   ├─► Interactive 3D visualization
+│   └─► Point cloud publishing
+│
 ├─► DataAcqTool.py ────► Live device acquisition GUI (Tkinter)
 │
 └─► LiveDemoTool.py (CatMausApp)
@@ -101,14 +115,14 @@ Launch the ROS segmentation nodes and related topics:
 ros2 launch scanlite_analysis_ros2 segmentation_launch.py 
 ```
 
-Run ROS Bag Testing GUI for validating segmentation:
+Run the 3D reconstruction node:
 ```bash
-ros2 run scanlite_analysis_ros2 rosbagtest.py
+ros2 run scanlite_analysis_ros2 reconstruction_node.py
 ```
 
 Start live device acquisition GUI:
 ```bash
-ros2 run scanlite_analysis_ros2 DataAcqTool.py
+ros2 run scanlite_analysis_ros2 segmentation_node.py
 ```
 
 Real-time segmentation visualization tool:
@@ -128,4 +142,5 @@ ros2 run scanlite_analysis_ros2 LiveDemoTool.py
 This project relies on **PyCATMAUS**, a library used for segmentation and transformation functions.
 
 🔗 **Repository:** [PyCATMAUS GitHub](https://github.com/ori-drs/cat_and_maus/tree/master/cat_maus_gui/scripts/PyCATMAUS)
+
 
