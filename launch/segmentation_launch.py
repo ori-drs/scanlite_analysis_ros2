@@ -18,15 +18,23 @@ def generate_launch_description():
         name='bag_play',
         output='screen'
     )
+
+    transformation_node = Node(
+        package='scanlite_analysis_ros2',
+        executable='transformation.py',
+        name='transformation',
+        output='screen',
+       )
     
     image_segmenter_node = Node(
         package='scanlite_analysis_ros2',
-        executable='LiveDemoTool.py',
+        executable='reconstruction_node.py',
         name='image_segmenter',
         output='screen',
         parameters=[{'image_topic': LaunchConfiguration('image_topic')}]
     )
     
+
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -36,5 +44,6 @@ def generate_launch_description():
     # Add the nodes
     ld.add_action(bag_play_node)
     ld.add_action(image_segmenter_node)
+    ld.add_action(transformation_node)
 
     return ld 

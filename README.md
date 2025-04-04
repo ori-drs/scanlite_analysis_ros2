@@ -11,9 +11,9 @@ scanlite_analysis_ros2/
 ├── scanlite_analysis_ros2/
 │   ├── segmentation_node.py
 │   ├── reconstruction_node.py
-        ├─► Real-time 3D reconstruction
-    │   ├─► Interactive 3D visualization
-    │   └─► Point cloud publishing
+|       ├─► Real-time 3D reconstruction
+|       ├─► Interactive 3D visualization
+|       └─► Point cloud publishing
 │   ├── rosbagtest.py
 │   ├── LiveDemoTool.py
 │   └── PyCATMAUS/
@@ -34,6 +34,7 @@ scanlite_analysis_ros2/
 - Subscribes to `/us_image` and `/vicon/clarius_5_marker/clarius_5_marker` topics
 - Publishes:
   - Segmented images (`/seg_bone/image`)
+  
   - 3D point cloud data (`/rec_bone/points`)
 - Features interactive 3D visualization using Matplotlib
 - Includes coordinate axes visualization for scanner position tracking

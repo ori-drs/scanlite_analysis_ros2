@@ -42,7 +42,7 @@ class BoneSegmentationNode(Node):
 
         # Subscribe to motion tracking topic
         self.motion_subscription = self.create_subscription(
-            TransformStamped, "/vicon/clarius_5_marker/clarius_5_marker", self.motion_callback, 10
+            TransformStamped, "/rigid_body_transforms", self.motion_callback, 10
         )
 
         # Publisher for segmented images
@@ -94,6 +94,11 @@ class BoneSegmentationNode(Node):
 
             # Apply Bone Segmentation (using fixed parameters)
             segmented_coords = RunBoneSeg(cv_image, F0=1, F1=1, Bth=0.1, JC=1)
+
+            if self.motion_buff is None:
+                self.get_logger().info("No motion data available")
+            if segmented_coords is None:
+                self.get_logger().info("No segmentation coordinates available")
 
             # If motion data is available, perform 3D transformation
             if self.motion_buff is not None:
@@ -165,7 +170,7 @@ class BoneSegmentationNode(Node):
         """Creates a PointCloud2 message from x, y, z coordinates."""
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = "vicon/clarius_5_marker/clarius_5_marker"
+        msg.header.frame_id = "scanlite_v16.scanlite_v16_2"
 
         # Convert points to meters
         points_x = np.array(points_x) / 1000.0
