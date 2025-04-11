@@ -71,7 +71,7 @@ scanlite_analysis_ros2/
 
 To run the system, you can use the following launch commands:
 
-### For IMU-based tracking:
+### For Vio-based tracking:
 ```bash
 ros2 launch scanlite_analysis_ros2 odom_launch.py
 ```
@@ -151,7 +151,7 @@ ros2 launch scanlite_analysis_ros2 segmentation_launch.py
 
 Run the 3D reconstruction node (choose based on tracking system):
 ```bash
-# For IMU tracking
+# For Vio tracking
 ros2 run scanlite_analysis_ros2 reconstruction_node.py
 
 # For Vicon tracking
