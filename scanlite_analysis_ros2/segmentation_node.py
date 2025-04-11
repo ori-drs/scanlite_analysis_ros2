@@ -61,7 +61,7 @@ class BoneSegmentationNode(Node):
             cv_image = self.bridge.imgmsg_to_cv2(msg, "mono8")
 
             # Apply Bone Segmentation (using fixed parameters F0, F1, Bth, JC)
-            segmented_coords = RunBoneSeg(cv_image, F0=5, F1=3, Bth=0.05, JC=3)
+            segmented_coords = RunBoneSeg(cv_image, F0=1, F1=1, Bth=0.1, JC=1)
 
             # Retrieve segmentation parameters
             seg_size = self.get_parameter("segmentation.size").value

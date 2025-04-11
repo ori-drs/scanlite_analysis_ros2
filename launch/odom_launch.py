@@ -21,7 +21,7 @@ def generate_launch_description():
 
     transformation_node = Node(
         package='scanlite_analysis_ros2',
-        executable='transformation.py',
+        executable='transformation_odom.py',
         name='transformation',
         output='screen',
        )
@@ -34,6 +34,14 @@ def generate_launch_description():
         parameters=[{'image_topic': LaunchConfiguration('image_topic')}]
     )
     
+    # Define the RViz node
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', '/home/nadia/ros2_humble/src/scanlite_analysis_ros2/config/vicon.rviz']
+    )
 
     # Create the launch description and populate
     ld = LaunchDescription()
@@ -45,5 +53,6 @@ def generate_launch_description():
     ld.add_action(bag_play_node)
     ld.add_action(image_segmenter_node)
     ld.add_action(transformation_node)
+    ld.add_action(rviz_node)
 
     return ld 

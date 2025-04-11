@@ -46,10 +46,19 @@ def main(args=None):
     rclpy.init(args=args)
     node = RosbagPlayerNode()
     try:
-        selected_bag = node.select_rosbag()
-        if selected_bag:
-            process = node.play_rosbag(selected_bag)
-            process.wait()  # Wait for bag playback to finish
+        # Select the first ROS 2 bag
+        selected_bag1 = node.select_rosbag()
+        # Select the second ROS 2 bag
+        selected_bag2 = node.select_rosbag()
+
+        # Play both bags if selected
+        if selected_bag1 and selected_bag2:
+            process1 = node.play_rosbag(selected_bag1)
+            process2 = node.play_rosbag(selected_bag2)
+            
+            # Wait for both processes to finish
+            process1.wait()
+            process2.wait()
     except KeyboardInterrupt:
         pass
     finally:

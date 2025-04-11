@@ -42,7 +42,7 @@ class BoneSegmentationNode(Node):
 
         # Subscribe to motion tracking topic
         self.motion_subscription = self.create_subscription(
-            TransformStamped, "/odomimu_transform", self.motion_callback, 10
+            TransformStamped, "/rigid_body_transforms", self.motion_callback, 10
         )
 
         # Publisher for segmented images
@@ -82,7 +82,7 @@ class BoneSegmentationNode(Node):
         # plt.pause(0.01)
 
         # Start visualization update loop
-        self.timer = self.create_timer(0.02, self.update_plot)
+        self.timer = self.create_timer(0.1, self.update_plot)
 
         self.get_logger().info("Bone Segmentation Node Started!")
 
@@ -167,29 +167,41 @@ class BoneSegmentationNode(Node):
             return None
 
     def create_point_cloud_msg(self, points_x, points_y, points_z):
-        """Creates an efficient PointCloud2 message from x, y, z coordinates using numpy arrays."""
-        # Convert points to meters and create numpy array
-        points = np.zeros((len(points_x), 3), dtype=np.float32)
-        points[:, 0] = np.array(points_x) / 1000.0  # X coordinate
-        points[:, 1] = np.array(points_y) / 1000.0  # Y coordinate
-        points[:, 2] = np.array(points_z) / 1000.0  # Z coordinate
-
-        # Create PointCloud2 message with minimal fields
+        """Creates a PointCloud2 message from x, y, z coordinates."""
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = "global"
+        msg.header.frame_id = "vicon"
 
-        # Define fields (only x, y, z)
+        # Convert points to meters
+        points_x = np.array(points_x) / 1000.0
+        points_y = np.array(points_y) / 1000.0
+        points_z = np.array(points_z) / 1000.0
+
+        # Define fields including RGB color
         msg.fields = [
             PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
             PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
             PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+            PointField(name='rgba', offset=12, datatype=PointField.UINT32, count=1),
         ]
         
-        msg.point_step = 12  # 4 bytes per float * 3 floats
+        msg.point_step = 16  # 4 bytes per float * 3 floats + 4 bytes for rgba
+        
+        # Create color data (blue with low alpha for smaller appearance)
+        # Format: 0xAABBGGRR (alpha, blue, green, red)
+        blue_semi_transparent = 0x40FF0000  # Alpha=0x40 (64), Blue=0xFF, Green=0x00, Red=0x00
+        
+        # Pack points and color into binary data
+        points_count = len(points_x)
+        points = np.zeros((points_count, 4), dtype=np.float32)
+        points[:, 0] = points_x
+        points[:, 1] = points_y
+        points[:, 2] = points_z
+        points[:, 3].view(np.uint32)[:] = blue_semi_transparent
+        
         msg.data = points.tobytes()
         msg.height = 1
-        msg.width = len(points_x)
+        msg.width = points_count
         msg.row_step = msg.point_step * msg.width
         msg.is_dense = True
         msg.is_bigendian = False
