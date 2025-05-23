@@ -2,6 +2,14 @@
 
 import os
 import sys
+import time  # At the top of your file
+
+# --- Add this block before importing matplotlib.pyplot ---
+if not os.environ.get("DISPLAY"):
+    import matplotlib
+    matplotlib.use('Agg')
+# --------------------------------------------------------
+
 import cv2
 import numpy as np
 import rclpy
@@ -28,6 +36,9 @@ except ModuleNotFoundError as e:
 
 class BoneSegmentationNode(Node):
     def __init__(self):
+        self.recons_x = []
+        self.recons_y = []
+        self.recons_z = []
         super().__init__('bone_segmentation_node')
         self.get_logger().info("Starting Bone Segmentation Node")
 
@@ -63,28 +74,33 @@ class BoneSegmentationNode(Node):
         }
 
         # Set up Matplotlib 3D plot
-        # self.fig = plt.figure()
-        # self.ax = self.fig.add_subplot(111, projection='3d')
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, projection='3d')
         
-        # # Initialize empty plot with fixed axis limits
-        # self.ax.set_xlim([50, 450])
-        # self.ax.set_ylim([1150, 1550])
-        # self.ax.set_zlim([800, 1200])
+        # Initialize empty plot with fixed axis limits
+        self.ax.set_xlim([50, 450])
+        self.ax.set_ylim([1150, 1550])
+        self.ax.set_zlim([800, 1200])
         
-        # # Initialize the 3D plot line
-        # self.reconstruct_3D, = self.ax.plot3D([], [], [], 'b.', ms=1)  # Match LiveDemoTool specs
+        # Initialize the 3D plot line
+        self.reconstruct_3D, = self.ax.plot3D([], [], [], 'b.', ms=1)  # Match LiveDemoTool specs
         
-        # self.ax.set_xlabel("X Axis")
-        # self.ax.set_ylabel("Y Axis")
-        # self.ax.set_zlabel("Z Axis")
-        # self.ax.set_title("3D Bone Reconstruction")
-        # plt.draw()
-        # plt.pause(0.01)
+        self.ax.set_xlabel("X Axis")
+        self.ax.set_ylabel("Y Axis")
+        self.ax.set_zlabel("Z Axis")
+        self.ax.set_title("3D Bone Reconstruction")
+        plt.draw()
+        plt.pause(0.01)
 
         # Start visualization update loop
-        self.timer = self.create_timer(0.1, self.update_plot)
+        self.timer = self.create_timer(0.05, self.update_plot)  # 0.05 seconds 
 
         self.get_logger().info("Bone Segmentation Node Started!")
+
+        # Initialize plot timing variables
+        self.last_plot_time = None
+        self.last_pc_time = None
+        self.plot_freq = 0.0
 
     def image_callback(self, msg):
         """ Processes incoming ultrasound image for bone segmentation. """
@@ -108,18 +124,6 @@ class BoneSegmentationNode(Node):
                     self.reconstruction_points['x'].extend(seg_glo[0])
                     self.reconstruction_points['y'].extend(seg_glo[1])
                     self.reconstruction_points['z'].extend(seg_glo[2])
-
-            # Convert to color image for visualization
-            seg_image = cv2.cvtColor(cv_image, cv2.COLOR_GRAY2BGR)
-
-            # Draw segmentation points
-            for x, y in zip(segmented_coords[0], segmented_coords[1]):
-                if 0 <= x < seg_image.shape[1] and 0 <= y < seg_image.shape[0]:
-                    cv2.circle(seg_image, (int(x), int(y)), radius=1, color=(0, 150, 255), thickness=-1)
-
-            # Publish segmented image
-            seg_msg = self.bridge.cv2_to_imgmsg(seg_image, "bgr8")
-            self.seg_image_pub.publish(seg_msg)
 
         except Exception as e:
             self.get_logger().error(f"Error processing image: {e}")
@@ -210,40 +214,32 @@ class BoneSegmentationNode(Node):
 
     def update_plot(self):
         """Updates both Matplotlib and RViz visualizations."""
-        if len(self.reconstruction_points['x']) > 0:
-            # self.ax.clear()
-            
-            # # Use plot3D instead of scatter for the reconstructed points
-            # self.reconstruct_3D, = self.ax.plot3D(
-            #     self.reconstruction_points['x'],
-            #     self.reconstruction_points['y'],
-            #     self.reconstruction_points['z'],
-            #     'b.',  # Blue dots
-            #     ms=1   # Marker size = 1
-            # )
-            
-            # # Add coordinate axes visualization at the current scanner position
-            # if self.motion_buff is not None:
-            #     pos_x = self.motion_buff.translation.x * 1000
-            #     pos_y = self.motion_buff.translation.y * 1000
-            #     pos_z = self.motion_buff.translation.z * 1000
-                
-            #     # Plot coordinate axes
-            #     self.ax.plot3D([pos_x, pos_x + 20], [pos_y, pos_y], [pos_z, pos_z], color='r')  # X axis
-            #     self.ax.plot3D([pos_x, pos_x], [pos_y, pos_y + 20], [pos_z, pos_z], color='g')  # Y axis
-            #     self.ax.plot3D([pos_x, pos_x], [pos_y, pos_y], [pos_z, pos_z + 20], color='b')  # Z axis
-            
-            # # Reset fixed axis limits after clearing
-            # self.ax.set_xlim([50, 450])
-            # self.ax.set_ylim([1150, 1550])
-            # self.ax.set_zlim([800, 1200])
-            
-            # self.ax.set_xlabel("X Axis")
-            # self.ax.set_ylabel("Y Axis")
-            # self.ax.set_zlabel("Z Axis")
-            # self.ax.set_title("3D Bone Reconstruction")
-            # plt.draw()
-            # plt.pause(0.01)
+        x = self.reconstruction_points['x']
+        y = self.reconstruction_points['y']
+        z = self.reconstruction_points['z']
+
+        # --- Frequency measurement ---
+        now = time.time()
+        if self.last_plot_time is not None:
+            dt = now - self.last_plot_time
+            if dt > 0:
+                self.plot_freq = 1.0 / dt
+                print(f"Matplotlib plot update frequency: {self.plot_freq:.2f} Hz")
+        self.last_plot_time = now
+        # ----------------------------
+
+        if len(x) > 0:
+            self.ax.cla()
+            self.ax.scatter(x, y, z, c='blue', marker='.', s=2)
+            self.ax.set_xlabel("X")
+            self.ax.set_ylabel("Y")
+            self.ax.set_zlabel("Z")
+            self.ax.set_title("3D Bone Reconstruction")
+            self.ax.set_xlim([-1000, -300])
+            self.ax.set_ylim([-600, 300])
+            self.ax.set_zlim([300, 700])
+            plt.draw()  # Redraw the plot
+            plt.pause(0.01)  # Pause briefly to allow the plot to update
 
             # Publish point cloud for RViz
             point_cloud_msg = self.create_point_cloud_msg(
@@ -251,19 +247,37 @@ class BoneSegmentationNode(Node):
                 self.reconstruction_points['y'],
                 self.reconstruction_points['z']
             )
+
+            # --- PointCloud2 frequency measurement ---
+            now_pc = time.time()
+            if self.last_pc_time is not None:
+                dt_pc = now_pc - self.last_pc_time
+                if dt_pc > 0:
+                    self.pc_freq = 1.0 / dt_pc
+                    print(f"PointCloud2 publish frequency: {self.pc_freq:.2f} Hz")
+            self.last_pc_time = now_pc
+            # -----------------------------------------
+
             self.point_cloud_pub.publish(point_cloud_msg)
+
+        # Limit the number of points stored for reconstruction
+        max_points = 10000  # or another reasonable limit
+        for key in self.reconstruction_points:
+            if len(self.reconstruction_points[key]) > max_points:
+                self.reconstruction_points[key] = self.reconstruction_points[key][-max_points:]
 
 def main(args=None):
     rclpy.init(args=args)
     node = BoneSegmentationNode()
     
     try:
-        # plt.ion()  # Enable interactive mode
+        plt.ion()  # Enable interactive mode
         # plt.show(block=False)  # Non-blocking display
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
     finally:
+        plt.close('all')  # Close all Matplotlib windows
         node.destroy_node()
         rclpy.shutdown()
 
